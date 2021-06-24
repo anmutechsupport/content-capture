@@ -159,3 +159,4 @@ print(scaler.fit_transform(rolling))
 
 svmclassifier = svm_model(rolling, labels_fil)
 
+print("mikael is legend")
