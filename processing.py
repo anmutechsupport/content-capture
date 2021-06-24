@@ -117,7 +117,7 @@ sample_rate = 256
 
 filenames = ['avatar1', 'avengers1', 'bbc1', 'bear1', 'bighero1', 'creed1', 'edgeoftmr11', 'gunviolence1', 'ironman1', 'joe1', 'lex1', 'vox1']
 
-files = [pd.read_csv(('{}.csvprocessed.csv').format(name)) for name in filenames]
+files = [pd.read_csv(('datasets/{}.csvprocessed.csv').format(name)) for name in filenames]
 
 data_sets = pd.concat(files, ignore_index=True).dropna()
 labels = data_sets["Interest"]
@@ -135,14 +135,14 @@ data = data_sets.drop(["Interest"], axis=1).to_numpy()
 # print(data.shape) #484352
 
 features = PSD(data[:, 1:], sample_rate, filtering=True)
-print(features.shape)
+# print(features.shape)
 
 # features = features[:, :160, :].reshape(160, 4, 6)
 
 ch, length, feats = features.shape[0], features.shape[1], features.shape[2] 
-print(ch, length, feats)
+# print(ch, length, feats)
 rolling = [[[[] for _ in range(int(length/interval))] for _ in range(feats)] for _ in range(ch)] #(4, 6, 94)
-print(np.array(rolling).shape)
+# print(np.array(rolling).shape)
 
 for interv in range(int(length/interval)): #(+20)
     for channel in range(ch):
@@ -150,13 +150,15 @@ for interv in range(int(length/interval)): #(+20)
             window = pd.Series(features[channel, interv*interval:interv*interval+interval, f]).rolling(window_size).mean().dropna()
             rolling[channel][f][interv].append([window.min(), window.max(), window.skew(), window.median()])
 
-rolling = np.array(rolling, dtype=object).reshape(94, ch*6*4) #(8, 4, 6, 4)
-print(rolling.shape)
-print(len(labels_fil))
+rolling = np.array(rolling, dtype=object).reshape(-1, ch*6*4) #(94, 4, 6, 4)
+# print(rolling.shape)
+# print(labels_fil)
 
 scaler = StandardScaler()
-print(scaler.fit_transform(rolling))
+normalized = scaler.fit_transform(rolling)
 
-svmclassifier = svm_model(rolling, labels_fil)
+# print(normalized.shape)
+
+svmclassifier = svm_model(normalized, labels_fil)
 
 print("mikael is legend")
