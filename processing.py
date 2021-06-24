@@ -1,8 +1,10 @@
+from math import log
 import seaborn as sn
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy import signal
+from sklearn import tree
 from sklearn.cluster import KMeans
 from brainflow.data_filter import DataFilter, DetrendOperations, FilterTypes, AggOperations, WindowFunctions, NoiseTypes
 from scipy.signal import butter, lfilter, lfilter_zi
@@ -97,19 +99,95 @@ def PSD(df, fs, filtering=False, streaming=False):
 def svm_model(data, labels):
 
     from sklearn.model_selection import train_test_split
-    X_train, X_test, y_train, y_test = train_test_split(rolling, labels, test_size = 0.20)
+    X_train, X_test, y_train, y_test = train_test_split(rolling, labels, test_size = 0.1)
 
     from sklearn.svm import SVC
-    svclassifier = SVC(kernel='rbf')
+    svclassifier = SVC(kernel='rbf', class_weight='balanced', C=1, gamma=0.001)
     svclassifier.fit(X_train, y_train)
     
     y_pred = svclassifier.predict(X_test)
 
     from sklearn.metrics import classification_report, confusion_matrix
+    print("SVM")
     print(confusion_matrix(y_test, y_pred))
     print(classification_report(y_test, y_pred))
 
     return svclassifier
+
+def tree_model(data, labels):
+
+    from sklearn.model_selection import train_test_split
+    X_train, X_test, y_train, y_test = train_test_split(rolling, labels, test_size = 0.1)
+
+    from sklearn.tree import DecisionTreeClassifier
+
+    treeclassifier = DecisionTreeClassifier(criterion='gini', max_features='log2', min_samples_leaf=1, min_samples_split=2, max_depth=5)
+    treeclassifier.fit(X_train, y_train)
+    
+    y_pred = treeclassifier.predict(X_test)
+
+    from sklearn.metrics import classification_report, confusion_matrix
+    print("Decision Tree")
+    print(confusion_matrix(y_test, y_pred))
+    print(classification_report(y_test, y_pred))
+
+    return treeclassifier
+
+
+def logreg_model(data, labels):
+
+    from sklearn.model_selection import train_test_split
+    X_train, X_test, y_train, y_test = train_test_split(rolling, labels, test_size = 0.1)
+
+    from sklearn.linear_model import LogisticRegression
+    logregclassifier = LogisticRegression(C=0.001)
+    logregclassifier.fit(X_train, y_train)
+    
+    y_pred = logregclassifier.predict(X_test)
+
+    from sklearn.metrics import classification_report, confusion_matrix
+    print("Logistic Regression")
+    print(confusion_matrix(y_test, y_pred))
+    print(classification_report(y_test, y_pred))
+
+    return logregclassifier
+
+def random_forest(data, labels):
+
+    from sklearn.model_selection import train_test_split
+    X_train, X_test, y_train, y_test = train_test_split(rolling, labels, test_size = 0.1)
+
+    from sklearn.ensemble import RandomForestClassifier
+    randomforest = RandomForestClassifier(criterion='gini', max_features='log2', min_samples_leaf=3,  min_samples_split=2, max_depth=5, n_estimators=5)
+    randomforest.fit(X_train, y_train)
+    
+    y_pred = randomforest.predict(X_test)
+
+    from sklearn.metrics import classification_report, confusion_matrix
+    print("Random Forests")
+    print(confusion_matrix(y_test, y_pred))
+    print(classification_report(y_test, y_pred))
+
+    return randomforest
+
+def ada_boost(data, labels):
+
+    from sklearn.model_selection import train_test_split
+    X_train, X_test, y_train, y_test = train_test_split(rolling, labels, test_size = 0.1)
+    
+    from sklearn.tree import DecisionTreeClassifier
+    from sklearn.ensemble import AdaBoostClassifier
+    adaboost = AdaBoostClassifier(base_estimator=DecisionTreeClassifier(criterion='gini', max_features='log2', min_samples_leaf=1, min_samples_split=2, max_depth=5), learning_rate=0.02, n_estimators=5)
+    adaboost.fit(X_train, y_train)
+    
+    y_pred = adaboost.predict(X_test)
+
+    from sklearn.metrics import classification_report, confusion_matrix
+    print("Ada_Boost")
+    print(confusion_matrix(y_test, y_pred))
+    print(classification_report(y_test, y_pred))
+
+    return adaboost
 
 window_size = 5
 interval = 20
@@ -152,7 +230,7 @@ for interv in range(int(length/interval)): #(+20)
 
 rolling = np.array(rolling, dtype=object).reshape(-1, ch*6*4) #(94, 4, 6, 4)
 # print(rolling.shape)
-# print(labels_fil)
+# print(np.count_nonzero(np.array(labels_fil) == 1))
 
 scaler = StandardScaler()
 normalized = scaler.fit_transform(rolling)
@@ -160,5 +238,10 @@ normalized = scaler.fit_transform(rolling)
 # print(normalized.shape)
 
 svmclassifier = svm_model(normalized, labels_fil)
+logregclassifier = logreg_model(normalized, labels_fil)
+dectreeclassifier = tree_model(normalized, labels_fil)
+randomforestclassifier = random_forest(normalized, labels_fil)
+adaboostclassifier = ada_boost(normalized, labels_fil)
+
 
 print("mikael is legend")
