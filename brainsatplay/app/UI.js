@@ -32,7 +32,7 @@ class UI{
                 <div>
                     <button id="musebutton" class="brainsatplay-default-button">Connect Muse</button>
                     <input type='file' id="${this.props.id}load"></input>
-                    <video id="video-container" controls></video>
+                    <video id="${this.props.id}video-container" controls></video>
                 </div>
             </div>`
         }
@@ -41,10 +41,26 @@ class UI{
         let setupHTML = () => {
             let load = document.getElementById(`${this.props.id}load`)
             load.onchange = (res) => {
+
+                // console.log(this.props.id) // this is the load element id, it is the same element used in the _handleVideoLoad
                 this._handleVideoLoad(load.files[0])
+                console.log(this.props.timestamps.start)
+            }
+            
+            let video = document.getElementById(`${this.props.id}video-container`)
+            video.onplaying = (res) => {
+                this.props.timestamps.start = Date.now()
+                console.log(this.props.timestamps.start = Date.now()); 
+            }
+
+            video.onended = (res) => {
+                this.props.timestamps.stop = Date.now()
+                const millis = this.props.timestamps.stop - this.props.timestamps.start
+
+                console.log(`seconds elapsed = ${Math.floor(millis / 1000)}`);
+                // this._onVideoStop()
             }
         }
-
 
         return {HTMLtemplate, setupHTML}
     }
@@ -56,12 +72,13 @@ class UI{
     deinit = () => {}
 
     _handleVideoLoad = (file) => {
+        // console.log(this.props.id)
         this.props.timestamps.start = Date.now()
         this.props.video = file
         console.log(this.props.video)
 
 
-        var video = document.getElementById('video-container');
+        var video = document.getElementById(`${this.props.id}video-container`);
         console.log(video)
         var fileUrl = window.URL.createObjectURL(this.props.video);
 

@@ -195,7 +195,7 @@ sample_rate = 256
 
 filenames = ['avatar1', 'avengers1', 'bbc1', 'bear1', 'bighero1', 'creed1', 'edgeoftmr11', 'gunviolence1', 'ironman1', 'joe1', 'lex1', 'vox1']
 
-files = [pd.read_csv(('datasets/{}.csvprocessed.csv').format(name)) for name in filenames]
+files = [pd.read_csv(('contentcapture/datasets/{}.csvprocessed.csv').format(name)) for name in filenames]
 
 data_sets = pd.concat(files, ignore_index=True).dropna()
 labels = data_sets["Interest"]
