@@ -32,6 +32,7 @@ class UI{
                 <div>
                     <button id="musebutton" class="brainsatplay-default-button">Connect Muse</button>
                     <input type='file' id="${this.props.id}load"></input>
+                    <video id="video-container" controls></video>
                 </div>
             </div>`
         }
@@ -57,7 +58,14 @@ class UI{
     _handleVideoLoad = (file) => {
         this.props.timestamps.start = Date.now()
         this.props.video = file
+        console.log(this.props.video)
+
+
+        var video = document.getElementById('video-container');
         console.log(video)
+        var fileUrl = window.URL.createObjectURL(this.props.video);
+
+        video.src = fileUrl;
 
     }
 

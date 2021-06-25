@@ -11,5 +11,5 @@ percentile = np.percentile(labels, 80)
 
 labels_norm = [1 if x == 4 or x == 5 else 0 for x in labels]
 
-print(labels_norm[10000:])
+# print(labels_norm)
 
