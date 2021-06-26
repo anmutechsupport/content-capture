@@ -19,6 +19,8 @@ class UI{
             video: null
         }
 
+        this.connected = false
+
         // Port Definition
         this.ports = {
             default: {},
@@ -32,19 +34,19 @@ class UI{
                 <div>
                     <button id="musebutton" class="brainsatplay-default-button">Connect Muse</button>
                     <input type='file' id="${this.props.id}load"></input>
-                    <video id="${this.props.id}video-container" controls></video>
+                    <video width="320" height="240" id="${this.props.id}video-container" controls></video>
                 </div>
             </div>`
         }
 
 
         let setupHTML = () => {
+
             let load = document.getElementById(`${this.props.id}load`)
             load.onchange = (res) => {
 
-                // console.log(this.props.id) // this is the load element id, it is the same element used in the _handleVideoLoad
-                this._handleVideoLoad(load.files[0])
-                // console.log(this.props.timestamps.start)
+                this.props.video = load.files[0]
+
             }
             
             let video = document.getElementById(`${this.props.id}video-container`)
@@ -72,12 +74,7 @@ class UI{
 
     deinit = () => {}
 
-    _handleVideoLoad = (file) => {
-        // console.log(this.props.id)
-        this.props.timestamps.start = Date.now()
-        this.props.video = file
-        console.log(this.props.video)
-
+    _handleVideoLoad = () => {
 
         var video = document.getElementById(`${this.props.id}video-container`);
         console.log(video)
@@ -92,9 +89,9 @@ class UI{
          this.props.timestamps.stop = Date.now()
 
 
-        //  // Grab Data from B@P
-        //  let data = this.session.atlas.data.eeg
-        //  console.log(data)
+         // Grab Data from B@P
+         let data = this.session.atlas.data.eeg
+         console.log(data)
 
          let url = 'http://127.0.0.1:5000/form-example'
          let timestamps = JSON.stringify(this.props.timestamps);
@@ -113,20 +110,21 @@ class UI{
  
         //  Send to server
         //  fetch(url, {method: 'POST', body: myString, headers: {'Content-Type': 'application/json', "Access-Control-Allow-Origin": "http://127.0.0.1:5000/"} }).then(res => {
-         fetch(url, {method: 'POST', body: formData, headers: {"Access-Control-Allow-Origin": "http://127.0.0.1:5000/"} }).then(res => {
+        //  fetch(url, {method: 'POST', body: formData, headers: {"Access-Control-Allow-Origin": "http://127.0.0.1:5000/"} }).then(res => {
  
-            //  Get Video Back
-             console.log(res)
+        //     //  Get Video Back
+        //      console.log(res)
              
-            //  Display Video
+        //     //  Display Video
              
-         })
+        //  })
     }
 
     _deviceConnected = () => {
         let museButton = document.getElementById(`${this.props.id}`).querySelector(`[id="musebutton"]`)
         museButton.style.display = 'none'
-        this._onVideoStop()
+        this._handleVideoLoad()
+
     }
 }
 export {UI}
