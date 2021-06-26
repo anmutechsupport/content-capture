@@ -44,21 +44,21 @@ class UI{
 
                 // console.log(this.props.id) // this is the load element id, it is the same element used in the _handleVideoLoad
                 this._handleVideoLoad(load.files[0])
-                console.log(this.props.timestamps.start)
+                // console.log(this.props.timestamps.start)
             }
             
             let video = document.getElementById(`${this.props.id}video-container`)
             video.onplaying = (res) => {
                 this.props.timestamps.start = Date.now()
-                console.log(this.props.timestamps.start = Date.now()); 
+                // console.log(this.props.timestamps.start); 
             }
 
             video.onended = (res) => {
-                this.props.timestamps.stop = Date.now()
-                const millis = this.props.timestamps.stop - this.props.timestamps.start
+                // this.props.timestamps.stop = Date.now()
+                // const millis = this.props.timestamps.stop - this.props.timestamps.start
 
-                console.log(`seconds elapsed = ${Math.floor(millis / 1000)}`);
-                // this._onVideoStop()
+                // console.log(`seconds elapsed = ${Math.floor(millis / 1000)}`);
+                this._onVideoStop()
             }
         }
 
@@ -91,24 +91,35 @@ class UI{
          this.props.timestamps.stop = Date.now()
 
 
-         // Grab Data from B@P
-         let data = this.session.atlas.data.eeg
-         console.log(data)
+        //  // Grab Data from B@P
+        //  let data = this.session.atlas.data.eeg
+        //  console.log(data)
+
+        let formData = new FormData();
+        formData.append('video', 'deeznuts')
+        formData.append('hello', this.props.video)
+
+        console.log(formData.get('video'))
+
  
-         let url = ''
+         let url = 'http://127.0.0.1:5000/form-example'
          let body = {
-             data, 
+            //  data, 
              timestamps: this.props.timestamps,
-             video: this.props.video
+             video: formData
          }
+
+         let myString = JSON.stringify(body);
+        //  console.log(myString)
  
-         // Send to server
-         fetch(url, {method: 'POST', body}).then(res => {
+        //  Send to server
+        //  fetch(url, {method: 'POST', body: myString, headers: {'Content-Type': 'application/json', "Access-Control-Allow-Origin": "http://127.0.0.1:5000/"} }).then(res => {
+         fetch(url, {method: 'POST', body: formData, headers: {"Access-Control-Allow-Origin": "http://127.0.0.1:5000/"} }).then(res => {
  
-             // Get Video Back
+            //  Get Video Back
              console.log(res)
              
-             // Display Video
+            //  Display Video
              
          })
     }
