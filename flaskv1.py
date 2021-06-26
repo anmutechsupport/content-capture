@@ -1,6 +1,7 @@
 # import main Flask class and request object
 from flask import Flask, request
 from flask_cors import CORS
+import json
 
 # create the Flask app
 app = Flask(__name__)
@@ -13,8 +14,11 @@ def query_example():
 @app.route('/form-example', methods=['POST', 'GET'])
 def form_example():
     if request.method == 'POST':
-        request_data = request.files.get('hello')
-        print(request_data)
+        request_file = request.files.get('video')
+        request_stamps = json.loads(request.form.get('timestamps'))
+     
+        print("elapsed time: {}".format(int(int(request_stamps["stop"])-int(request_stamps["start"]))/1000))
+        print(request_file)
         
     return 'Form Data Example'
 

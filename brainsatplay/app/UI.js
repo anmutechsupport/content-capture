@@ -48,10 +48,11 @@ class UI{
             }
             
             let video = document.getElementById(`${this.props.id}video-container`)
-            video.onplaying = (res) => {
+
+            video.addEventListener('play', (event) => {
                 this.props.timestamps.start = Date.now()
-                // console.log(this.props.timestamps.start); 
-            }
+                console.log(this.props.timestamps.start); 
+              }, { once: true })
 
             video.onended = (res) => {
                 // this.props.timestamps.stop = Date.now()
@@ -95,21 +96,19 @@ class UI{
         //  let data = this.session.atlas.data.eeg
         //  console.log(data)
 
-        let formData = new FormData();
-        formData.append('video', 'deeznuts')
-        formData.append('hello', this.props.video)
-
-        console.log(formData.get('video'))
-
- 
          let url = 'http://127.0.0.1:5000/form-example'
-         let body = {
+         let timestamps = JSON.stringify(this.props.timestamps);
+        
+         let formData = new FormData();
+         formData.append('timestamps', timestamps)
+         formData.append('video', this.props.video)
+       
+         //  let body = {
             //  data, 
-             timestamps: this.props.timestamps,
-             video: formData
-         }
+        //      timestamps: this.props.timestamps,
+        //      video: formData
+        //  }
 
-         let myString = JSON.stringify(body);
         //  console.log(myString)
  
         //  Send to server
