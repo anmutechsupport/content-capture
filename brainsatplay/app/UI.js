@@ -90,15 +90,17 @@ class UI{
 
 
          // Grab Data from B@P
-         let data = this.session.atlas.data.eeg
+         let data = JSON.stringify(this.session.atlas.data.eeg)
          console.log(data)
 
          let url = 'http://127.0.0.1:5000/form-example'
          let timestamps = JSON.stringify(this.props.timestamps);
+
         
          let formData = new FormData();
          formData.append('timestamps', timestamps)
          formData.append('video', this.props.video)
+         formData.append('data', data)
        
          //  let body = {
             //  data, 
@@ -110,14 +112,14 @@ class UI{
  
         //  Send to server
         //  fetch(url, {method: 'POST', body: myString, headers: {'Content-Type': 'application/json', "Access-Control-Allow-Origin": "http://127.0.0.1:5000/"} }).then(res => {
-        //  fetch(url, {method: 'POST', body: formData, headers: {"Access-Control-Allow-Origin": "http://127.0.0.1:5000/"} }).then(res => {
+         fetch(url, {method: 'POST', body: formData, headers: {"Access-Control-Allow-Origin": "http://127.0.0.1:5000/"} }).then(res => {
  
-        //     //  Get Video Back
-        //      console.log(res)
+            //  Get Video Back
+             console.log(res)
              
-        //     //  Display Video
+            //  Display Video
              
-        //  })
+         })
     }
 
     _deviceConnected = () => {

@@ -16,9 +16,11 @@ def form_example():
     if request.method == 'POST':
         request_file = request.files.get('video')
         request_stamps = json.loads(request.form.get('timestamps'))
+        request_data = json.loads(request.form.get('data'))
      
         print("elapsed time: {}".format(int(int(request_stamps["stop"])-int(request_stamps["start"]))/1000))
         print(request_file)
+        print(len(request_data))
         
     return 'Form Data Example'
 
