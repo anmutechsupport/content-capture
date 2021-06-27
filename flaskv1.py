@@ -1,6 +1,7 @@
 # import main Flask class and request object
 from flask import Flask, request
 from flask_cors import CORS
+import pickle
 import json
 
 # create the Flask app
@@ -21,6 +22,9 @@ def form_example():
         print("elapsed time: {}".format(int(int(request_stamps["stop"])-int(request_stamps["start"]))/1000))
         print(request_file)
         print(len(request_data))
+                
+        # with open(f"bapeeg.pkl", "wb") as outfile:
+        #     pickle.dump(request_data, outfile)
         
     return 'Form Data Example'
 

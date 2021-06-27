@@ -19,7 +19,8 @@ class UI{
             video: null
         }
 
-        this.connected = false
+        this.connected = true
+        this.packagedData = null
 
         // Port Definition
         this.ports = {
@@ -46,6 +47,12 @@ class UI{
             load.onchange = (res) => {
 
                 this.props.video = load.files[0]
+                
+                if (this.connected == true) {
+              
+                    this._handleVideoLoad()
+
+                }
 
             }
             
@@ -90,43 +97,77 @@ class UI{
 
 
          // Grab Data from B@P
-         let data = JSON.stringify(this.session.atlas.data.eeg)
+         let data = this.session.atlas.data.eeg
          console.log(data)
+        //  Object.keys(data).forEach((prop)=> console.log(prop));
 
-         let url = 'http://127.0.0.1:5000/form-example'
          let timestamps = JSON.stringify(this.props.timestamps);
 
         
          let formData = new FormData();
          formData.append('timestamps', timestamps)
          formData.append('video', this.props.video)
-         formData.append('data', data)
-       
-         //  let body = {
-            //  data, 
-        //      timestamps: this.props.timestamps,
-        //      video: formData
-        //  }
+         formData.append('data', JSON.stringify(data))
 
-        //  console.log(myString)
- 
+         this.packagedData = formData
+
+         var element = document.getElementById(this.props.id)
+         var btn = document.createElement("BUTTON");  
+         btn.type = "button";
+         btn.innerHTML = "submit your session";                   
+         element.appendChild(btn);  
+         
+         btn.onclick = (e) => {
+            
+            e.preventDefault() // does nothing, i'm guessing that the page isn't refreshing because there is now a button of type button
+            this._postForm()
+
+            // return false;
+
+        
+        }
+    }
+
+
+        
+        //  formData.addEventListener("submit", (event) => {
+        //     event.preventDefault();
+        //   });
+
+    _postForm = () => {
+
+        let url = 'http://127.0.0.1:5000/form-example'
         //  Send to server
         //  fetch(url, {method: 'POST', body: myString, headers: {'Content-Type': 'application/json', "Access-Control-Allow-Origin": "http://127.0.0.1:5000/"} }).then(res => {
-         fetch(url, {method: 'POST', body: formData, headers: {"Access-Control-Allow-Origin": "http://127.0.0.1:5000/"} }).then(res => {
- 
-            //  Get Video Back
-             console.log(res)
-             
-            //  Display Video
-             
-         })
+         fetch(url, {method: 'POST', body: this.packagedData, headers: {"Access-Control-Allow-Origin": "http://127.0.0.1:5000/"} })
+        .then(res => {
+
+            console.log(res)
+
+        })
+        .catch((error) => {
+
+        console.error('Error:', error);
+        
+        });
+
+        // return false; //preventing form reload
+
     }
 
     _deviceConnected = () => {
         let museButton = document.getElementById(`${this.props.id}`).querySelector(`[id="musebutton"]`)
         museButton.style.display = 'none'
-        this._handleVideoLoad()
+        this.connected = true
+        if (this.props.video !== null) {
+
+            this._handleVideoLoad()
+
+        }
 
     }
 }
 export {UI}
+
+// when stream connects, file loads
+//if file is not available, file doesn't load
