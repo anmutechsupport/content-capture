@@ -13,8 +13,9 @@ class UI{
         this.props = {
             id: String(Math.floor(Math.random()*1000000)),
             timestamps: {
-                start: null,
-                stop: null
+                startStream: null,
+                stop: null,
+                startVideo: null, 
             },
             video: null
         }
@@ -59,8 +60,8 @@ class UI{
             let video = document.getElementById(`${this.props.id}video-container`)
 
             video.addEventListener('play', (event) => {
-                this.props.timestamps.start = Date.now()
-                console.log(this.props.timestamps.start); 
+                this.props.timestamps.startVideo = Date.now()
+                console.log(this.props.timestamps.startVideo); 
               }, { once: true })
 
             video.onended = (res) => {
@@ -123,8 +124,8 @@ class UI{
             this._postForm()
 
             // return false;
-
         
+
         }
     }
 
@@ -159,6 +160,7 @@ class UI{
         let museButton = document.getElementById(`${this.props.id}`).querySelector(`[id="musebutton"]`)
         museButton.style.display = 'none'
         this.connected = true
+        this.props.timestamps.startStream = Date.now()
         if (this.props.video !== null) {
 
             this._handleVideoLoad()
