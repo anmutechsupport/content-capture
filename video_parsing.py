@@ -40,18 +40,29 @@ cap = cv2.VideoCapture("test.mp4")
 # get total number of frames
 totalFrames = cap.get(cv2.CAP_PROP_FRAME_COUNT)
 
-for frame in myFrameNumber:
+for frameInd in myFrameNumber:
 
-    # check for valid frame number
-    if myFrameNumber >= 0 & myFrameNumber <= totalFrames:
+# check for valid frame number
+    if frameInd >= 0 & frameInd <= totalFrames:
         # set frame position
-        cap.set(cv2.CAP_PROP_POS_FRAMES,myFrameNumber)
+        cap.set(cv2.CAP_PROP_POS_FRAMES,frameInd)
 
-    while True:
+    numFrames = []
+    while cap.isOpened():
         ret, frame = cap.read()
-        if ret:   
-            cv2.imshow("Video", frame)
-            if cv2.waitKey(20) & 0xFF == ord('q'):
-                break
+        if ret:
+            numFrames.append(frame)
+            # cv2.imshow("frame", frame)
+            # if cv2.waitKey(25) == ord('q'):
+            #     break
+            if len(numFrames) == 25*10:
+                break 
+            #############################
+            temp_file = tempfile.TemporaryFile()
+            np.save(temp_file, frame)
+            temp_file.seek(0)
+            # upload_to_some_where(temp_file.read())
+            temp_file.close()
 
+cap.release()
 cv2.destroyAllWindows()
