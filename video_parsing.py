@@ -5,20 +5,29 @@ import numpy as np
 from PIL import Image
 import os
 
-def parse_video(fileV, timestamps=[500, 2000, 4000]):
+def parse_video(fileV, features=[500, 2000, 4000]):
 
-    myFrameNumber = timestamps
     cap = cv2.VideoCapture(fileV.name) #fig this shi out 
 
     fps = cap.get(cv2.CAP_PROP_FPS)
     width  = cap.get(cv2.CAP_PROP_FRAME_WIDTH)   # float
     height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)  # float
 
+    if features is parse_video.__defaults__[0]:
+        print('default')
+        timestamps = features
+    else:
+        timestamps = []
+        for ind, lab in enumerate(features):
+            if lab == 1:
+                timestamps.append(int(ind*20*fps))
+        print('passed in the call')
+
     # get total number of frames
     totalFrames = cap.get(cv2.CAP_PROP_FRAME_COUNT)
 
     requestedFrames = []
-    for frameInd in myFrameNumber:
+    for frameInd in timestamps:
 
     # check for valid frame number
         if frameInd >= 0 & frameInd <= totalFrames:
@@ -35,7 +44,7 @@ def parse_video(fileV, timestamps=[500, 2000, 4000]):
                 # cv2.imshow("frame", frame)
                 # if cv2.waitKey(25) == ord('q'):
                 #     break
-                if len(numFrames) == 25*10:
+                if len(numFrames) == 25*20:
                     # print("haha")
                     requestedFrames.append(numFrames)
                     break 

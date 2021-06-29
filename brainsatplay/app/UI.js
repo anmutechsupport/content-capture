@@ -20,7 +20,7 @@ class UI{
             video: null
         }
 
-        this.connected = true
+        this.connected = false
         this.packagedData = null
 
         // Port Definition

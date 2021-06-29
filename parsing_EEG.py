@@ -1,24 +1,31 @@
-import pickle
+# import pickle
 import pandas as pd
 import numpy as np
 import processing
 
-with open("bapeeg.pkl", "rb") as infile:
-    eeg = pickle.load(infile)
+# with open("bapeeg.pkl", "rb") as infile:
+#     eeg = pickle.load(infile)
 
-# print(eeg)
+# with open("timestamps.pkl", "rb") as infile:
+#     timestamps = pickle.load(infile)
 
-fs = 256
-# order of array [af7, af8, tp9, tp10]
-input_arr = np.array([x["raw"] for x in eeg[:4]]).T
-# print(input_arr.shape)
+def predict(eeg, timestamps):
 
-features = processing.PSD(input_arr, fs, filtering=True)
+    delay = int(((timestamps["startVideo"] - timestamps["startStream"])/1000)*256)
+    # print(delay)
 
-normalized = processing.descriptive_stats(features)
-print(normalized.shape)
+    fs = 256
+    # order of array [af7, af8, tp9, tp10]
+    input_arr = np.array([x["raw"][delay:] for x in eeg[:4]]).T
+    # print(input_arr.shape)
 
-model = processing.create_modelFinal()
+    features = processing.PSD(input_arr, fs, filtering=True)
 
-predictions = model.predict(normalized)
-print(predictions)
+    normalized = processing.descriptive_stats(features)
+    # print(normalized.shape)
+
+    model = processing.create_modelFinal()
+
+    predictions = model.predict(normalized)
+
+    return predictions

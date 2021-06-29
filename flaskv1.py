@@ -7,14 +7,11 @@ import werkzeug
 import cv2
 import tempfile
 from video_parsing import parse_video
+from parsing_EEG import predict
 
 # create the Flask app
 app = Flask(__name__)
 CORS(app)
-
-@app.route('/query-example')
-def query_example():
-    return 'Query String Example'
 
 @app.route('/form-example', methods=['POST', 'GET'])
 def form_example():
@@ -39,20 +36,14 @@ def form_example():
         # with open(f"timestamps.pkl", "wb") as outfile:
         #     pickle.dump(request_stamps, outfile)
 
+        features = predict(request_data, request_stamps)
+
         with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as temp:
             # print(temp.name)
             temp.write(request_file.read())
 
-        newfile = parse_video(temp)
+        newfile = parse_video(temp, features)
         print(newfile.name)
-
-        
-        # incoming = FileStorage(request.stream)
-        # with NamedTemporaryFile(delete=False) as tmpFile:
-        #         incoming.save(tmpFile)
-
-        # with open('binary.mp4', 'rb') as wfile:
-        #     wfile.write(binary_string)
 
     return 'Form Data Example'
 
