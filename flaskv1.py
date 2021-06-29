@@ -5,6 +5,8 @@ import pickle
 import json
 import werkzeug
 import cv2
+import tempfile
+from video_parsing import parse_video
 
 # create the Flask app
 app = Flask(__name__)
@@ -22,34 +24,14 @@ def form_example():
         request_data = json.loads(request.form.get('data'))
      
         # print("elapsed time: {}".format(int(int(request_stamps["stop"])-int(request_stamps["startStream"]))/1000))
-        print(request_file)
-        print(request_stamps)
-        print(len(request_data))
+        # print(request_file)
+        # print(request_stamps)
+        # print(len(request_data))
 
         # request_file.save('test.mp4')
 
-        # request_file.seek(0)
-        # video = cv2.VideoCapture(request_file.name)
-        # while video.isOpened():
-        #     ret, frame = video.read()
-        #     if ret:
-        #     # For testing purpose
-        #         cv2.imshow("frame", frame)
-        #     if cv2.waitKey(25) == ord('q'):
-        #         print("nice")
-        #         break
-        #   ##############################
-        #     # temp_file = TemporaryFile()
-        #     # np.save(temp_file, frame)
-        #     # temp_file.seek(0)
-        #     # upload_to_some_where(temp_file.read())
-        #     # temp_file.close()
-        #     else:
-        #         break
-        # video.release()
-        # request_file.close()
-
         # Note: when the request objects are saved, page refreshes
+        # Note: file.read() returns bin, file.stream returns a spooledtempfile
                 
         # with open(f"bapeeg.pkl", "wb") as outfile:
         #     pickle.dump(request_data, outfile)
@@ -57,8 +39,20 @@ def form_example():
         # with open(f"timestamps.pkl", "wb") as outfile:
         #     pickle.dump(request_stamps, outfile)
 
-        # with open(f"videoFile.pkl", "wb") as outfile:
-        #     pickle.dump(request_file, outfile)
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as temp:
+            # print(temp.name)
+            temp.write(request_file.read())
+
+        newfile = parse_video(temp)
+        print(newfile.name)
+
+        
+        # incoming = FileStorage(request.stream)
+        # with NamedTemporaryFile(delete=False) as tmpFile:
+        #         incoming.save(tmpFile)
+
+        # with open('binary.mp4', 'rb') as wfile:
+        #     wfile.write(binary_string)
 
     return 'Form Data Example'
 

@@ -6,6 +6,8 @@ import processing
 with open("bapeeg.pkl", "rb") as infile:
     eeg = pickle.load(infile)
 
+# print(eeg)
+
 fs = 256
 # order of array [af7, af8, tp9, tp10]
 input_arr = np.array([x["raw"] for x in eeg[:4]]).T
