@@ -1,12 +1,9 @@
-from threading import local
 import cv2
 import tempfile
-import numpy as np
-from PIL import Image
-import os
 
 def parse_video(fileV, features=[500, 2000, 4000]):
 
+    fileV.seek(0)
     cap = cv2.VideoCapture(fileV.name) #fig this shi out 
 
     fps = cap.get(cv2.CAP_PROP_FPS)
@@ -51,7 +48,8 @@ def parse_video(fileV, features=[500, 2000, 4000]):
 
     cap.release()
 
-    namedtemp = tempfile.NamedTemporaryFile(delete=False)
+    namedtemp = tempfile.NamedTemporaryFile(delete=False, suffix='.avi')
+    namedtemp.seek(0)
 
     out = cv2.VideoWriter(namedtemp.name, cv2.VideoWriter_fourcc(*'DIVX'), fps, (int(width), int(height)))
     for segment in requestedFrames:

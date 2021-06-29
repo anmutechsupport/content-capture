@@ -1,13 +1,8 @@
 import math
-import seaborn as sn
 import pandas as pd
-import matplotlib.pyplot as plt
 import numpy as np
 from scipy import signal
-from sklearn import tree
-from sklearn.cluster import KMeans
-from brainflow.data_filter import DataFilter, DetrendOperations, FilterTypes, AggOperations, WindowFunctions, NoiseTypes
-from scipy.signal import butter, lfilter, lfilter_zi
+from brainflow.data_filter import DataFilter, FilterTypes, NoiseTypes
 from tqdm import tqdm 
 from sklearn.preprocessing import StandardScaler
 

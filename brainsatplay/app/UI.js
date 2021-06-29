@@ -20,7 +20,7 @@ class UI{
             video: null
         }
 
-        this.connected = false
+        this.connected = true
         this.packagedData = null
 
         // Port Definition
@@ -37,6 +37,7 @@ class UI{
                     <button id="musebutton" class="brainsatplay-default-button">Connect Muse</button>
                     <input type='file' id="${this.props.id}load"></input>
                     <video width="320" height="240" id="${this.props.id}video-container" controls></video>
+                    <div id="${this.props.id}myVideo"></div>
                 </div>
             </div>`
         }
@@ -143,7 +144,22 @@ class UI{
          fetch(url, {method: 'POST', body: this.packagedData, headers: {"Access-Control-Allow-Origin": "http://127.0.0.1:5000/"} })
         .then(res => {
 
-            console.log(res)
+            return res.blob();
+
+        })
+        .then(blob => {
+
+            let objectURL = URL.createObjectURL(blob);
+           
+            var c = document.getElementById (`${this.props.id}myVideo`);
+            // Create an element <video>
+            var v = document.createElement ("video");
+            // Set the attributes of the video
+            v.src = objectURL;
+            v.controls = true;
+            // Add the video to <div>
+            c.appendChild (v);
+
 
         })
         .catch((error) => {

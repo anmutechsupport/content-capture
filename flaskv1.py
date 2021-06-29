@@ -1,10 +1,7 @@
 # import main Flask class and request object
-from flask import Flask, request, make_response
+from flask import Flask, request, make_response, send_file, abort
 from flask_cors import CORS
-import pickle
 import json
-import werkzeug
-import cv2
 import tempfile
 from video_parsing import parse_video
 from parsing_EEG import predict
@@ -36,14 +33,21 @@ def form_example():
         # with open(f"timestamps.pkl", "wb") as outfile:
         #     pickle.dump(request_stamps, outfile)
 
-        features = predict(request_data, request_stamps)
+        # features = predict(request_data, request_stamps)
+        features = predict()
 
         with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as temp:
             # print(temp.name)
             temp.write(request_file.read())
-
-        newfile = parse_video(temp, features)
+            temp.seek(0)
+            newfile = parse_video(temp, features)
+            newfile.seek(0)
+            
         print(newfile.name)
+        try:
+            return send_file(newfile.name, as_attachment=True)
+        except FileNotFoundError:
+            abort(404)
 
     return 'Form Data Example'
 

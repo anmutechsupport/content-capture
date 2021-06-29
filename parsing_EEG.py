@@ -1,15 +1,14 @@
-# import pickle
-import pandas as pd
+import pickle
 import numpy as np
 import processing
 
-# with open("bapeeg.pkl", "rb") as infile:
-#     eeg = pickle.load(infile)
+with open("bapeeg.pkl", "rb") as infile:
+    eeg = pickle.load(infile)
 
-# with open("timestamps.pkl", "rb") as infile:
-#     timestamps = pickle.load(infile)
+with open("timestamps.pkl", "rb") as infile:
+    timestamps = pickle.load(infile)
 
-def predict(eeg, timestamps):
+def predict(eeg=eeg, timestamps=timestamps):
 
     delay = int(((timestamps["startVideo"] - timestamps["startStream"])/1000)*256)
     # print(delay)
