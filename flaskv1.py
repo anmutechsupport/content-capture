@@ -5,6 +5,7 @@ import json
 import tempfile
 from video_parsing import parse_video
 from parsing_EEG import predict
+from cleanup import FileRemover
 import os
 
 # create the Flask app
@@ -14,6 +15,9 @@ CORS(app)
 @app.route('/form-example', methods=['POST', 'GET'])
 def form_example():
     if request.method == 'POST':
+
+        fileremover = FileRemover()
+
         request_file = request.files.get('video')
         request_stamps = json.loads(request.form.get('timestamps'))
         request_data = json.loads(request.form.get('data'))
@@ -37,7 +41,7 @@ def form_example():
         # features = predict(request_data, request_stamps)
         features = predict()
 
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as temp:
+        with tempfile.NamedTemporaryFile(suffix=".mp4") as temp:
             # print(temp.name)
             temp.write(request_file.read())
             temp.seek(0)
@@ -48,7 +52,10 @@ def form_example():
             print(rel_path)
             try:
                 # return send_file(newfile.name, as_attachment=True)
-                return send_from_directory(tempfile.gettempdir(), rel_path, as_attachment=True) #as_attachment = True
+                resp = send_from_directory(tempfile.gettempdir(), rel_path, as_attachment=True)
+                fileremover.cleanup_once_done(resp, newfile.name)
+
+                return resp #as_attachment = True
             except FileNotFoundError:
                 abort(404)
 

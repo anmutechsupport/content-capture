@@ -17,7 +17,8 @@ class UI{
                 stop: null,
                 startVideo: null, 
             },
-            video: null
+            video: null,
+            objectURL: null
         }
 
         this.connected = true
@@ -130,6 +131,28 @@ class UI{
         }
     }
 
+    _download = (url, ref) => {
+        const a = document.createElement('a')
+        a.href = url
+        a.download = url.split('/').pop()
+        ref.appendChild(a)
+        a.click()
+        ref.removeChild(a)
+      }
+
+    _createEditLink = (blob, ref) => {
+        this.props.objectURL = window.URL.createObjectURL(blob);
+           
+        // Create an element <video>
+        let v = document.createElement ("video");
+        // Set the attributes of the video
+        v.src = this.props.objectURL;
+        v.controls = true;
+        v.height = 240;
+        v.width = 320;
+        // Add the video to <div>
+        ref.appendChild (v);
+    }
         
         //  formData.addEventListener("submit", (event) => {
         //     event.preventDefault();
@@ -144,28 +167,20 @@ class UI{
         .then(res => {
 
             console.log(res.type)
+            console.log(res)
             return res.blob();
 
         })
         .then(blob => {
             
             console.log(blob)
-            console.log(blob.type)
-            console.log(blob.size)
-            let objectURL = window.URL.createObjectURL(blob);
-           
-            var c = document.getElementById (`${this.props.id}myVideo`);
-            // Create an element <video>
-            var v = document.createElement ("video");
-            // Set the attributes of the video
-            console.log(objectURL)
-            v.src = objectURL;
-            v.controls = true;
-            v.height = 240;
-            v.width = 320;
-            // Add the video to <div>
-            c.appendChild (v);
 
+            let c = document.getElementById (`${this.props.id}myVideo`);
+            //Create new video element.
+            this._createEditLink(blob, c)
+
+            // Create anchor element.
+            this._download(this.props.objectURL, c)
 
         })
         .catch((error) => {
