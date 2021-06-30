@@ -1,13 +1,14 @@
 # import main Flask class and request object
-from flask import Flask, request, make_response, send_file, abort
+from flask import Flask, request, make_response, send_file, abort, send_from_directory
 from flask_cors import CORS
 import json
 import tempfile
 from video_parsing import parse_video
 from parsing_EEG import predict
+import os
 
 # create the Flask app
-app = Flask(__name__)
+app = Flask(__name__) # static_url_path=('/Users/anush/AppData/Local/Temp')
 CORS(app)
 
 @app.route('/form-example', methods=['POST', 'GET'])
@@ -16,7 +17,7 @@ def form_example():
         request_file = request.files.get('video')
         request_stamps = json.loads(request.form.get('timestamps'))
         request_data = json.loads(request.form.get('data'))
-     
+
         # print("elapsed time: {}".format(int(int(request_stamps["stop"])-int(request_stamps["startStream"]))/1000))
         # print(request_file)
         # print(request_stamps)
@@ -43,11 +44,13 @@ def form_example():
             newfile = parse_video(temp, features)
             newfile.seek(0)
             
-        print(newfile.name)
-        try:
-            return send_file(newfile.name, as_attachment=True)
-        except FileNotFoundError:
-            abort(404)
+            rel_path = os.path.relpath(newfile.name, tempfile.gettempdir())
+            print(rel_path)
+            try:
+                # return send_file(newfile.name, as_attachment=True)
+                return send_from_directory(tempfile.gettempdir(), rel_path, as_attachment=True) #as_attachment = True
+            except FileNotFoundError:
+                abort(404)
 
     return 'Form Data Example'
 

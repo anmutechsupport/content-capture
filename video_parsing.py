@@ -1,5 +1,6 @@
 import cv2
 import tempfile
+from random import random
 
 def parse_video(fileV, features=[500, 2000, 4000]):
 
@@ -48,15 +49,19 @@ def parse_video(fileV, features=[500, 2000, 4000]):
 
     cap.release()
 
-    namedtemp = tempfile.NamedTemporaryFile(delete=False, suffix='.avi')
+    suffix = ".mp4"
+    prefix = ("johnny{}").format(round(random()*1000000))
+    namedtemp = tempfile.NamedTemporaryFile(delete=False, prefix=prefix, suffix=suffix)
     namedtemp.seek(0)
 
-    out = cv2.VideoWriter(namedtemp.name, cv2.VideoWriter_fourcc(*'DIVX'), fps, (int(width), int(height)))
+    fourcc = cv2.VideoWriter_fourcc(*'avc1')
+    out = cv2.VideoWriter(namedtemp.name, fourcc, fps, (int(width), int(height)))
     for segment in requestedFrames:
         for x in segment:
             # writing to a image array
             # print(x.shape)
             out.write(x)
+
     out.release()
 
     cv2.destroyAllWindows()
@@ -65,19 +70,21 @@ def parse_video(fileV, features=[500, 2000, 4000]):
 
 
 """"""
+# fileV = "test.mp4"
 
-# myFrameNumber = [500, 2000, 4000]
-# cap = cv2.VideoCapture("test.mp4")
+# cap = cv2.VideoCapture(fileV) #fig this shi out 
 
 # fps = cap.get(cv2.CAP_PROP_FPS)
 # width  = cap.get(cv2.CAP_PROP_FRAME_WIDTH)   # float
 # height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)  # float
 
+# timestamps = [500, 2000, 4000]
+
 # # get total number of frames
 # totalFrames = cap.get(cv2.CAP_PROP_FRAME_COUNT)
 
 # requestedFrames = []
-# for frameInd in myFrameNumber:
+# for frameInd in timestamps:
 
 # # check for valid frame number
 #     if frameInd >= 0 & frameInd <= totalFrames:
@@ -94,21 +101,27 @@ def parse_video(fileV, features=[500, 2000, 4000]):
 #             # cv2.imshow("frame", frame)
 #             # if cv2.waitKey(25) == ord('q'):
 #             #     break
-#             if len(numFrames) == 25*10:
+#             if len(numFrames) == 25*20:
 #                 # print("haha")
 #                 requestedFrames.append(numFrames)
 #                 break 
 
 # cap.release()
 
-# out = cv2.VideoWriter('video.avi',cv2.VideoWriter_fourcc(*'DIVX'), fps, (int(width), int(height)))
+# suffix = ".mp4"
+# prefix = ("johnny{}").format(round(random()*1000000))
+# namedtemp = tempfile.NamedTemporaryFile(delete=False, prefix=prefix, suffix=suffix)
+# namedtemp.seek(0)
+
+# fourcc = cv2.VideoWriter_fourcc(*'avc1')
+# out = cv2.VideoWriter(namedtemp.name, fourcc, fps, (int(width), int(height)))
 # for segment in requestedFrames:
 #     for x in segment:
 #         # writing to a image array
 #         # print(x.shape)
 #         out.write(x)
 
-# # print(out)
+# print(namedtemp.name)
 # out.release()
 
 # cv2.destroyAllWindows()

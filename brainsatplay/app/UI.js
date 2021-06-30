@@ -130,7 +130,6 @@ class UI{
         }
     }
 
-
         
         //  formData.addEventListener("submit", (event) => {
         //     event.preventDefault();
@@ -144,19 +143,26 @@ class UI{
          fetch(url, {method: 'POST', body: this.packagedData, headers: {"Access-Control-Allow-Origin": "http://127.0.0.1:5000/"} })
         .then(res => {
 
+            console.log(res.type)
             return res.blob();
 
         })
         .then(blob => {
-
-            let objectURL = URL.createObjectURL(blob);
+            
+            console.log(blob)
+            console.log(blob.type)
+            console.log(blob.size)
+            let objectURL = window.URL.createObjectURL(blob);
            
             var c = document.getElementById (`${this.props.id}myVideo`);
             // Create an element <video>
             var v = document.createElement ("video");
             // Set the attributes of the video
+            console.log(objectURL)
             v.src = objectURL;
             v.controls = true;
+            v.height = 240;
+            v.width = 320;
             // Add the video to <div>
             c.appendChild (v);
 
