@@ -18,7 +18,8 @@ class UI{
                 startVideo: null, 
             },
             video: null,
-            objectURL: null
+            objectURL: null,
+            loader: null
         }
 
         this.pages = {
@@ -40,18 +41,34 @@ class UI{
     init = () => {
         // Simply define the HTML template
         let HTMLtemplate = () => {return `
+        <link rel="stylesheet" href="style.css">
             <div id='${this.props.id}' style='height:100%; width:100%; display: flex; align-items: center; justify-content: center;'>
-                <div id='${this.props.id}div1' style='z-index: 4; position: absolute; transition: opacity 1s;'>
-                    <button id="musebutton" class="brainsatplay-default-button">Connect Muse</button>
-                    <input type='file' id="${this.props.id}load"></input>
+                <div id='${this.props.id}div1' style='z-index: 4; position: absolute; transition: opacity 1s; display: flex; flex-direction: column; gap: 15px;'>
+                    <h1 style="color:blue; text-align: center; margin-top: 0; margin-bottom: 0;"> MindFrames </h1>
+                    <div>
+                        <p style='text-align: center; color:blue;'>
+                        MindFrame uses your brainwaves to generate montages of parts that you find interesting in a video! 
+                        <br>Mp4 files are currently the only container type that is supported.  
+                        </p>
+                    </div>
+                    <div style='display: flex; gap: 20px; position: relative; top: 10px;'>
+                        <button style='position: relative; top: -18px;' id="musebutton" class="brainsatplay-default-button">Connect Muse</button>
+                        <input type='file' id="${this.props.id}load" accept=".mp4" ></input>
+                    </div>
                 </div>
-                <div id='${this.props.id}div2' style='z-index: 3; position: absolute; opacity: 0; transition: opacity 1s;'>
-                    <video width="320" height="240" id="${this.props.id}video-container" controls></video>
+                <div id='${this.props.id}div2' style='z-index: 3; position: absolute; opacity: 0; transition: opacity 1s; display: flex; flex-direction: column; gap: 15px;'>
+                    <video id="${this.props.id}video-container" controls></video>
+                    <div id='${this.props.id}divchild2' style='display: flex; flex-direction: row; gap: 15px;'>
+                        <h3 style='color: blue;' >Watch the video. Make sure not to move around!</h3>
+                    </div>
                 </div>
-                <div id='${this.props.id}div3' style='z-index: 2; position: absolute; opacity: 0; transition: opacity 1s;'>
+                <div id='${this.props.id}div3' style='z-index: 2; position: absolute; opacity: 0; transition: opacity 1s; display: flex; flex-direction: column; gap: 15px;'>
+                    <div class="spinning" id="${this.props.id}loading"></div>
+                    <div>
+                        <p> Please hold until the edited video compiles. </p>
+                    </div>
                 </div>
                 <div id='${this.props.id}div4' style='z-index: 1; position: absolute; opacity: 0; transition: opacity 1s;'>
-                    <div id="${this.props.id}myVideo"></div>
                 </div>
             </div>`
         }
@@ -62,7 +79,9 @@ class UI{
             this.pages.div1 = document.getElementById(`${this.props.id}div1`)
             this.pages.div2 = document.getElementById(`${this.props.id}div2`)
             this.pages.div3 = document.getElementById(`${this.props.id}div3`)
-            this.pages.div4 = document.getElementById(`${this.props.id}div3`)
+            this.pages.div4 = document.getElementById(`${this.props.id}div4`)
+
+            this.props.loader = document.getElementById(`${this.props.id}loading`);
 
             let load = document.getElementById(`${this.props.id}load`)
             load.onchange = (res) => {
@@ -106,6 +125,18 @@ class UI{
 
     deinit = () => {}
 
+    // showing loading
+    _displayLoading = (loader) => {
+        loader.classList.add("display");
+    
+    }
+
+    // hiding loading 
+    _hideLoading = (loader) => {
+        loader.classList.remove("display");
+    }
+
+
     _handleVideoLoad = () => {
 
         var video = document.getElementById(`${this.props.id}video-container`);
@@ -141,14 +172,17 @@ class UI{
 
          this.packagedData = formData
 
+         let divref = document.getElementById(`${this.props.id}divchild2`)
          var btn = document.createElement("BUTTON");  
          btn.type = "button";
-         btn.innerHTML = "Download the interesting bits!";                   
-         this.pages.div2.appendChild(btn);  
+         btn.innerHTML = "Download the interesting bits!";    
+         btn.className = "brainsatplay-default-button";               
+         divref.appendChild(btn);  
          
          btn.onclick = (e) => {
             
-            e.preventDefault() // does nothing, i'm guessing that the page isn't refreshing because there is now a button of type button
+            e.preventDefault()
+            this._setOpacity(this.pages.div2, this.pages.div3) // does nothing, i'm guessing that the page isn't refreshing because there is now a button of type button
             this._postForm()
 
             // return false;
@@ -166,7 +200,7 @@ class UI{
         ref.removeChild(a)
     }
 
-    _createEditLink = (blob, ref) => {
+    _createEditVideo = (blob, ref) => {
         this.props.objectURL = window.URL.createObjectURL(blob);
            
         // Create an element <video>
@@ -174,8 +208,6 @@ class UI{
         // Set the attributes of the video
         v.src = this.props.objectURL;
         v.controls = true;
-        v.height = 240;
-        v.width = 320;
         // Add the video to <div>
         ref.appendChild (v);
     }
@@ -187,6 +219,7 @@ class UI{
     _postForm = () => {
 
         let url = 'http://127.0.0.1:5000/form-example'
+        this._displayLoading(this.props.loader)
         //  Send to server
         //  fetch(url, {method: 'POST', body: myString, headers: {'Content-Type': 'application/json', "Access-Control-Allow-Origin": "http://127.0.0.1:5000/"} }).then(res => {
          fetch(url, {method: 'POST', body: this.packagedData, headers: {"Access-Control-Allow-Origin": "http://127.0.0.1:5000/"} })
@@ -199,14 +232,16 @@ class UI{
         })
         .then(blob => {
             
+            this._hideLoading(this.props.loader)
             console.log(blob)
 
-            let c = document.getElementById (`${this.props.id}myVideo`);
+            // let c = document.getElementById (`${this.props.id}myVideo`);
             //Create new video element.
-            this._createEditLink(blob, c)
+            this._setOpacity(this.pages.div3, this.pages.div4)
+            this._createEditVideo(blob, this.pages.div4)
 
             // Create anchor element.
-            this._download(this.props.objectURL, c)
+            this._download(this.props.objectURL, this.pages.div4)
 
         })
         .catch((error) => {
