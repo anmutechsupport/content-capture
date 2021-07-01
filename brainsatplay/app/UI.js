@@ -21,6 +21,13 @@ class UI{
             objectURL: null
         }
 
+        this.pages = {
+            div1: null,
+            div2: null,
+            div3: null,
+            div4: null
+        }
+
         this.connected = true
         this.packagedData = null
 
@@ -34,10 +41,16 @@ class UI{
         // Simply define the HTML template
         let HTMLtemplate = () => {return `
             <div id='${this.props.id}' style='height:100%; width:100%; display: flex; align-items: center; justify-content: center;'>
-                <div>
+                <div id='${this.props.id}div1' style='z-index: 4; position: absolute; transition: opacity 1s;'>
                     <button id="musebutton" class="brainsatplay-default-button">Connect Muse</button>
                     <input type='file' id="${this.props.id}load"></input>
+                </div>
+                <div id='${this.props.id}div2' style='z-index: 3; position: absolute; opacity: 0; transition: opacity 1s;'>
                     <video width="320" height="240" id="${this.props.id}video-container" controls></video>
+                </div>
+                <div id='${this.props.id}div3' style='z-index: 2; position: absolute; opacity: 0; transition: opacity 1s;'>
+                </div>
+                <div id='${this.props.id}div4' style='z-index: 1; position: absolute; opacity: 0; transition: opacity 1s;'>
                     <div id="${this.props.id}myVideo"></div>
                 </div>
             </div>`
@@ -46,13 +59,22 @@ class UI{
 
         let setupHTML = () => {
 
+            this.pages.div1 = document.getElementById(`${this.props.id}div1`)
+            this.pages.div2 = document.getElementById(`${this.props.id}div2`)
+            this.pages.div3 = document.getElementById(`${this.props.id}div3`)
+            this.pages.div4 = document.getElementById(`${this.props.id}div3`)
+
             let load = document.getElementById(`${this.props.id}load`)
             load.onchange = (res) => {
 
                 this.props.video = load.files[0]
                 
                 if (this.connected == true) {
-              
+                    
+                    // let div1 = document.getElementsById(`${this.props.id}div1`)
+                    // let div2 = document.getElementById(`${this.props.id}div2`)
+
+                    this._setOpacity(this.pages.div1, this.pages.div2)
                     this._handleVideoLoad()
 
                 }
@@ -91,7 +113,12 @@ class UI{
         var fileUrl = window.URL.createObjectURL(this.props.video);
 
         video.src = fileUrl;
+    }
 
+    _setOpacity = (inp, out) => {
+        inp.style.opacity = "0";
+        out.style.opacity = "1";
+        inp.style.display = 'none';
     }
 
     _onVideoStop = () => {
@@ -114,11 +141,10 @@ class UI{
 
          this.packagedData = formData
 
-         var element = document.getElementById(this.props.id)
          var btn = document.createElement("BUTTON");  
          btn.type = "button";
-         btn.innerHTML = "submit your session";                   
-         element.appendChild(btn);  
+         btn.innerHTML = "Download the interesting bits!";                   
+         this.pages.div2.appendChild(btn);  
          
          btn.onclick = (e) => {
             
@@ -138,7 +164,7 @@ class UI{
         ref.appendChild(a)
         a.click()
         ref.removeChild(a)
-      }
+    }
 
     _createEditLink = (blob, ref) => {
         this.props.objectURL = window.URL.createObjectURL(blob);
@@ -199,7 +225,8 @@ class UI{
         this.connected = true
         this.props.timestamps.startStream = Date.now()
         if (this.props.video !== null) {
-
+            
+            this._setOpacity(this.pages.div1, this.pages.div2)
             this._handleVideoLoad()
 
         }
