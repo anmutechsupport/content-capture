@@ -46,11 +46,14 @@ class UI{
         <link rel="stylesheet" href="style.css">
             <div id='${this.props.id}' style='height:100%; width:100%; display: flex; align-items: center; justify-content: center;'>
                 <div class="pages" id='${this.props.id}div1' style='z-index: 5;'>
-                    <h1 style="color:blue; text-align: center; margin-top: 0; margin-bottom: 0;"> MindFrames </h1>
+                    <h1 style="text-align: center; position: relative; top: 15px;"> MindFrames </h1>
                     <div>
-                        <p style='text-align: center; color:blue;'>
-                        MindFrame uses your brainwaves to generate montages of parts that you find interesting in a video! 
-                        <br>Mp4 files are currently the only container type that is supported.  
+                        <p>
+                        MindFrame uses your brainwaves to generate montages of 
+                        <br>parts that you find interesting in a video! 
+                        <br>
+                        <br>Mp4 files are currently the only container type that is supported.
+                        <br>This application requires a Muse 2 EEG headband.   
                         </p>
                     </div>
                     <div style='display: flex; gap: 20px; position: relative; top: 10px;'>
@@ -59,6 +62,7 @@ class UI{
                     </div>
                 </div>
                 <div class="pages" id='${this.props.id}div2' style='z-index: 4; opacity: 0;'>
+                    <h1 style="text-align: left;"> MindFrames </h1>
                     <video id="${this.props.id}video-container" controls></video>
                     <div id='${this.props.id}divchild2' style='display: flex; flex-direction: row; gap: 15px;'>
                         <h3 style='color: blue;' >Watch the video. Make sure not to move around!</h3>
@@ -71,6 +75,8 @@ class UI{
                     </div>
                 </div>
                 <div class="pages" id='${this.props.id}div4' style='z-index: 2; opacity: 0;'>
+                    <h1 style="text-align: left;"> MindFrames </h1>
+                    <p style='text-align: left;' id='${this.props.id}endesc'> This is your final edited video </p>
                 </div>
                 <div class="pages" id='${this.props.id}div5' style='z-index: 1; opacity: 0;'>
                     <h1> The download failed, please try again. </h1>
@@ -221,7 +227,7 @@ class UI{
         v.src = this.props.objectURL;
         v.controls = true;
         // Add the video to <div>
-        ref.appendChild (v);
+        ref.before(v);
     }
         
         //  formData.addEventListener("submit", (event) => {
@@ -250,7 +256,8 @@ class UI{
             // let c = document.getElementById (`${this.props.id}myVideo`);
             //Create new video element.
             this._setOpacity(this.pages.currdiv, this.pages.div4)
-            this._createEditVideo(blob, this.pages.div4)
+            let endesc = document.getElementById(`${this.props.id}endesc`)
+            this._createEditVideo(blob, endesc)
 
             // Create anchor element.
             this._download(this.props.objectURL, this.pages.div4)

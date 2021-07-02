@@ -6,12 +6,30 @@ body {
     height: 100vh;
 }
 
+h1 {
+    font-size: 200%; 
+    margin-top: 0; 
+    margin-bottom: 0;
+    color:blue; 
+ }
+
+ ul {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+ p {
+    text-align: center; 
+    color:blue;
+ }
+
 .pages {
     position: absolute; 
     transition: opacity 1s; 
     display: flex; 
     flex-direction: 
-    column; gap: 15px;
+    column; gap: 20px;
 }
         
 #application {

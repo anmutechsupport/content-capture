@@ -39,13 +39,14 @@ def form_example():
         #     pickle.dump(request_stamps, outfile)
 
         # features = predict(request_data, request_stamps)
-        features = predict()
+        # features = predict()
 
         with tempfile.NamedTemporaryFile(suffix=".mp4") as temp:
             # print(temp.name)
             temp.write(request_file.read())
             temp.seek(0)
-            newfile = parse_video(temp, features)
+            # newfile = parse_video(temp, features)
+            newfile, timestamps = parse_video(temp)
             newfile.seek(0)
             
             rel_path = os.path.relpath(newfile.name, tempfile.gettempdir())
