@@ -19,14 +19,16 @@ class UI{
             },
             video: null,
             objectURL: null,
-            loader: null
+            loader: null,
+            loadButton: null
         }
 
         this.pages = {
             div1: null,
             div2: null,
             div3: null,
-            div4: null
+            div4: null,
+            currdiv: null
         }
 
         this.connected = true
@@ -43,7 +45,7 @@ class UI{
         let HTMLtemplate = () => {return `
         <link rel="stylesheet" href="style.css">
             <div id='${this.props.id}' style='height:100%; width:100%; display: flex; align-items: center; justify-content: center;'>
-                <div id='${this.props.id}div1' style='z-index: 4; position: absolute; transition: opacity 1s; display: flex; flex-direction: column; gap: 15px;'>
+                <div class="pages" id='${this.props.id}div1' style='z-index: 5;'>
                     <h1 style="color:blue; text-align: center; margin-top: 0; margin-bottom: 0;"> MindFrames </h1>
                     <div>
                         <p style='text-align: center; color:blue;'>
@@ -56,19 +58,22 @@ class UI{
                         <input type='file' id="${this.props.id}load" accept=".mp4" ></input>
                     </div>
                 </div>
-                <div id='${this.props.id}div2' style='z-index: 3; position: absolute; opacity: 0; transition: opacity 1s; display: flex; flex-direction: column; gap: 15px;'>
+                <div class="pages" id='${this.props.id}div2' style='z-index: 4; opacity: 0;'>
                     <video id="${this.props.id}video-container" controls></video>
                     <div id='${this.props.id}divchild2' style='display: flex; flex-direction: row; gap: 15px;'>
                         <h3 style='color: blue;' >Watch the video. Make sure not to move around!</h3>
                     </div>
                 </div>
-                <div id='${this.props.id}div3' style='z-index: 2; position: absolute; opacity: 0; transition: opacity 1s; display: flex; flex-direction: column; gap: 15px;'>
+                <div class="pages" id='${this.props.id}div3' style='z-index: 3; opacity: 0;'>
                     <div class="spinning" id="${this.props.id}loading"></div>
                     <div>
                         <p> Please hold until the edited video compiles. </p>
                     </div>
                 </div>
-                <div id='${this.props.id}div4' style='z-index: 1; position: absolute; opacity: 0; transition: opacity 1s;'>
+                <div class="pages" id='${this.props.id}div4' style='z-index: 2; opacity: 0;'>
+                </div>
+                <div class="pages" id='${this.props.id}div5' style='z-index: 1; opacity: 0;'>
+                    <h1> The download failed, please try again. </h1>
                 </div>
             </div>`
         }
@@ -80,6 +85,7 @@ class UI{
             this.pages.div2 = document.getElementById(`${this.props.id}div2`)
             this.pages.div3 = document.getElementById(`${this.props.id}div3`)
             this.pages.div4 = document.getElementById(`${this.props.id}div4`)
+            this.pages.div5 = document.getElementById(`${this.props.id}div5`)
 
             this.props.loader = document.getElementById(`${this.props.id}loading`);
 
@@ -107,13 +113,17 @@ class UI{
                 console.log(this.props.timestamps.startVideo); 
               }, { once: true })
 
-            video.onended = (res) => {
-                // this.props.timestamps.stop = Date.now()
-                // const millis = this.props.timestamps.stop - this.props.timestamps.start
-
-                // console.log(`seconds elapsed = ${Math.floor(millis / 1000)}`);
+            video.addEventListener('ended', (event) => {
                 this._onVideoStop()
-            }
+              }, { once: true })
+
+            // video.onended = (res) => {
+            //     // this.props.timestamps.stop = Date.now()
+            //     // const millis = this.props.timestamps.stop - this.props.timestamps.start
+
+            //     // console.log(`seconds elapsed = ${Math.floor(millis / 1000)}`);
+            //     this._onVideoStop()
+            // }
         }
 
         return {HTMLtemplate, setupHTML}
@@ -150,6 +160,8 @@ class UI{
         inp.style.opacity = "0";
         out.style.opacity = "1";
         inp.style.display = 'none';
+        out.style.display = "";
+        this.pages.currdiv = out;
     }
 
     _onVideoStop = () => {
@@ -173,16 +185,16 @@ class UI{
          this.packagedData = formData
 
          let divref = document.getElementById(`${this.props.id}divchild2`)
-         var btn = document.createElement("BUTTON");  
-         btn.type = "button";
-         btn.innerHTML = "Download the interesting bits!";    
-         btn.className = "brainsatplay-default-button";               
-         divref.appendChild(btn);  
+         this.props.loadButton = document.createElement("BUTTON");  
+         this.props.loadButton.type = "button";
+         this.props.loadButton.innerHTML = "Download the interesting bits!";    
+         this.props.loadButton.className = "brainsatplay-default-button";               
+         divref.appendChild(this.props.loadButton);  
          
-         btn.onclick = (e) => {
+         this.props.loadButton.onclick = (e) => {
             
             e.preventDefault()
-            this._setOpacity(this.pages.div2, this.pages.div3) // does nothing, i'm guessing that the page isn't refreshing because there is now a button of type button
+            this._setOpacity(this.pages.currdiv, this.pages.div3) // does nothing, i'm guessing that the page isn't refreshing because there is now a button of type button
             this._postForm()
 
             // return false;
@@ -237,7 +249,7 @@ class UI{
 
             // let c = document.getElementById (`${this.props.id}myVideo`);
             //Create new video element.
-            this._setOpacity(this.pages.div3, this.pages.div4)
+            this._setOpacity(this.pages.currdiv, this.pages.div4)
             this._createEditVideo(blob, this.pages.div4)
 
             // Create anchor element.
@@ -247,6 +259,13 @@ class UI{
         .catch((error) => {
 
         console.error('Error:', error);
+
+        this._setOpacity(this.pages.currdiv, this.pages.div5)
+
+        this.props.loadButton.innerHTML = "Retry Download"
+        this.props.loadButton.style.margin = "auto"
+        this.pages.currdiv.appendChild(this.props.loadButton)
+
         
         });
 

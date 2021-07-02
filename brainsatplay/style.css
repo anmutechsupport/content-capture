@@ -5,6 +5,14 @@ body {
     width: 100vw; 
     height: 100vh;
 }
+
+.pages {
+    position: absolute; 
+    transition: opacity 1s; 
+    display: flex; 
+    flex-direction: 
+    column; gap: 15px;
+}
         
 #application {
     width: 100%; 

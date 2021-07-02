@@ -24,31 +24,6 @@ def parse_video(fileV, features=[500, 2000, 4000]):
     # get total number of frames
     totalFrames = cap.get(cv2.CAP_PROP_FRAME_COUNT)
 
-    requestedFrames = []
-    for frameInd in timestamps:
-
-    # check for valid frame number
-        if frameInd >= 0 & frameInd <= totalFrames:
-            # set frame position
-            cap.set(cv2.CAP_PROP_POS_FRAMES,frameInd)
-
-        # requestedFrames = []
-        numFrames = []
-        while cap.isOpened():
-            ret, frame = cap.read()
-            if ret:
-                numFrames.append(frame)
-
-                # cv2.imshow("frame", frame)
-                # if cv2.waitKey(25) == ord('q'):
-                #     break
-                if len(numFrames) == int(fps*20):
-                    # print("haha")
-                    requestedFrames.append(numFrames)
-                    break 
-
-    cap.release()
-
     suffix = ".mp4"
     prefix = ("johnny{}").format(round(random()*1000000))
     namedtemp = tempfile.NamedTemporaryFile(delete=False, prefix=prefix, suffix=suffix)
@@ -56,14 +31,30 @@ def parse_video(fileV, features=[500, 2000, 4000]):
 
     fourcc = cv2.VideoWriter_fourcc(*'avc1')
     out = cv2.VideoWriter(namedtemp.name, fourcc, fps, (int(width), int(height)))
-    for segment in requestedFrames:
-        for x in segment:
-            # writing to a image array
-            # print(x.shape)
-            out.write(x)
 
+    for frameInd in timestamps:
+
+    # check for valid frame number
+        if frameInd >= 0 & frameInd <= totalFrames:
+            # set frame position
+            cap.set(cv2.CAP_PROP_POS_FRAMES,frameInd)
+
+        i = 0
+        while cap.isOpened():
+            ret, frame = cap.read()
+            if ret:
+                # print(i)
+                i += 1
+                out.write(frame)
+
+                # cv2.imshow("frame", frame)
+                # if cv2.waitKey(25) == ord('q'):
+                #     break
+                if i == int(fps*20):
+                    break 
+
+    cap.release()
     out.release()
-
     cv2.destroyAllWindows()
 
     return namedtemp
