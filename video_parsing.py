@@ -57,7 +57,7 @@ def parse_video(fileV, features=[500, 2000, 4000]):
     out.release()
     cv2.destroyAllWindows()
 
-    return namedtemp
+    return namedtemp, timestamps
 
 
 """"""

@@ -1,5 +1,5 @@
 # import main Flask class and request object
-from flask import Flask, request, make_response, send_file, abort, send_from_directory
+from flask import Flask, request, jsonify, send_file, abort, send_from_directory
 from flask_cors import CORS
 import json
 import tempfile
@@ -56,7 +56,7 @@ def form_example():
                 resp = send_from_directory(tempfile.gettempdir(), rel_path, as_attachment=True)
                 fileremover.cleanup_once_done(resp, newfile.name)
 
-                return resp #as_attachment = True
+                return (resp, jsonify(timestamps)) #as_attachment = True
             except FileNotFoundError:
                 abort(404)
 
