@@ -33,6 +33,8 @@ class UI{
 
         this.connected = true
         this.packagedData = null
+        this.packagedVid = null
+        this.interestPoints = null
 
         // Port Definition
         this.ports = {
@@ -75,8 +77,7 @@ class UI{
                     </div>
                 </div>
                 <div class="pages" id='${this.props.id}div4' style='z-index: 2; opacity: 0;'>
-                    <h1 style="text-align: left;"> MindFrames </h1>
-                    <p style='text-align: left;' id='${this.props.id}endesc'> This is your final edited video </p>
+                    <h1 id='${this.props.id}endesc' style="text-align: left;"> MindFrames </h1>
                 </div>
                 <div class="pages" id='${this.props.id}div5' style='z-index: 1; opacity: 0;'>
                     <h1> The download failed, please try again. </h1>
@@ -179,16 +180,17 @@ class UI{
          let data = this.session.atlas.data.eeg
          console.log(data)
         //  Object.keys(data).forEach((prop)=> console.log(prop));
-
-         let timestamps = JSON.stringify(this.props.timestamps);
-
         
          let formData = new FormData();
-         formData.append('timestamps', timestamps)
-         formData.append('video', this.props.video)
+         formData.append('timestamps', JSON.stringify(this.props.timestamps))
          formData.append('data', JSON.stringify(data))
 
+         let formData1 = new FormData();
+         formData1.append('video', this.props.video)
+
          this.packagedData = formData
+         this.packagedVid = formData1
+       
 
          let divref = document.getElementById(`${this.props.id}divchild2`)
          this.props.loadButton = document.createElement("BUTTON");  
@@ -227,7 +229,7 @@ class UI{
         v.src = this.props.objectURL;
         v.controls = true;
         // Add the video to <div>
-        ref.before(v);
+        ref.appendChild(v);
     }
         
         //  formData.addEventListener("submit", (event) => {
@@ -236,11 +238,20 @@ class UI{
 
     _postForm = () => {
 
-        let url = 'http://127.0.0.1:5000/form-example'
+        let urlLabels = 'http://127.0.0.1:5000/labels'
+        let urlCompile = 'http://127.0.0.1:5000/compile'
         this._displayLoading(this.props.loader)
-        //  Send to server
-        //  fetch(url, {method: 'POST', body: myString, headers: {'Content-Type': 'application/json', "Access-Control-Allow-Origin": "http://127.0.0.1:5000/"} }).then(res => {
-         fetch(url, {method: 'POST', body: this.packagedData, headers: {"Access-Control-Allow-Origin": "http://127.0.0.1:5000/"} })
+
+         fetch(urlLabels, {method: 'POST', body: this.packagedData, headers: {"Access-Control-Allow-Origin": "http://127.0.0.1:5000/"} })
+        .then(response => response.json())
+        .then(data => {
+
+            console.log(data)
+            this.interestPoints = data
+            this.packagedVid.append('labels', JSON.stringify(data))
+
+            return fetch(urlCompile, {method: 'POST', body: this.packagedVid, headers: {"Access-Control-Allow-Origin": "http://127.0.0.1:5000/"} })
+        })
         .then(res => {
 
             console.log(res.type)
@@ -256,8 +267,23 @@ class UI{
             // let c = document.getElementById (`${this.props.id}myVideo`);
             //Create new video element.
             this._setOpacity(this.pages.currdiv, this.pages.div4)
-            let endesc = document.getElementById(`${this.props.id}endesc`)
-            this._createEditVideo(blob, endesc)
+
+            // let endesc = document.getElementById(`${this.props.id}endesc`)
+            let interestCount = document.createElement('p')
+            let timePoints = []
+            this.interestPoints.forEach((value, i) => {
+                if (value == 1) timePoints.push(i*20);
+            })
+
+            interestCount.append(document.createTextNode(`Your video has compiled. In total, MindFrame found that you were interested ${this.interestPoints.filter(x => x === 1).length} times. 
+            \nThese are the time points you found interesting in seconds: ${timePoints}
+            \nMindFrame parses together 20 second sequences after the timepoints above.`))
+            interestCount.style.textAlign = "left";
+            interestCount.style.whiteSpace = "pre";
+            interestCount.style.lineHeight = "80%"
+            this.pages.div4.appendChild(interestCount)
+
+            this._createEditVideo(blob, this.pages.div4)
 
             // Create anchor element.
             this._download(this.props.objectURL, this.pages.div4)

@@ -1,6 +1,7 @@
 import cv2
 import tempfile
 from random import random
+from moviepy.editor import *
 
 def parse_video(fileV, features=[500, 2000, 4000]):
 
@@ -8,6 +9,7 @@ def parse_video(fileV, features=[500, 2000, 4000]):
     cap = cv2.VideoCapture(fileV.name) #fig this shi out 
 
     fps = cap.get(cv2.CAP_PROP_FPS)
+
     width  = cap.get(cv2.CAP_PROP_FRAME_WIDTH)   # float
     height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)  # float
 
@@ -57,7 +59,7 @@ def parse_video(fileV, features=[500, 2000, 4000]):
     out.release()
     cv2.destroyAllWindows()
 
-    return namedtemp, timestamps
+    return namedtemp
 
 
 """"""
@@ -383,3 +385,39 @@ def parse_video(fileV, features=[500, 2000, 4000]):
 # out.release()
 # cv2.destroyAllWindows()
 # fvs.stop()
+
+""""""
+
+def newParse(fileV, features=[500, 2000, 4000]):
+
+    fileV.seek(0)
+    print(fileV.name)
+    
+    file = VideoFileClip(fileV.name)
+    clips = []
+
+    if features is parse_video.__defaults__[0]:
+        print('default')
+        timestamps = features
+    else:
+        timestamps = []
+        for ind, lab in enumerate(features):
+            if lab == 1:
+                timestamps.append(int(ind*20))
+        print('passed in the call')
+
+    for x in timestamps:
+        clips.append(file.subclip(x, x+20))
+
+    final_clip = concatenate_videoclips(clips)
+
+    suffix = ".mp4"
+    prefix = ("johnny{}").format(round(random()*1000000))
+    namedtemp = tempfile.NamedTemporaryFile(delete=False, prefix=prefix, suffix=suffix)
+    namedtemp.seek(0)
+    
+    final_clip.write_videofile(namedtemp.name)
+
+    return namedtemp
+
+
