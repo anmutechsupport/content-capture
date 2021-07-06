@@ -7,6 +7,7 @@ from video_parsing import *
 from parsing_EEG import predict
 from cleanup import FileRemover
 import os
+from moviepy.editor import *
 
 # create the Flask app
 app = Flask(__name__) # static_url_path=('/Users/anush/AppData/Local/Temp')
@@ -75,12 +76,13 @@ def json_example():
 
         print(request_labels)
 
-        with tempfile.NamedTemporaryFile(suffix=".mp4") as temp:
+        with tempfile.NamedTemporaryFile(suffix=".mp4", delete=False) as temp:
             # print(temp.name)
             temp.write(request_file.read())
             temp.seek(0)
+            print(temp.name)
             # newfile = parse_video(temp, features)
-            newfile = parse_video(temp, request_labels)
+            newfile = newParse(temp, request_labels)
             newfile.seek(0)
             
             rel_path = os.path.relpath(newfile.name, tempfile.gettempdir())

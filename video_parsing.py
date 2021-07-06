@@ -391,7 +391,6 @@ def parse_video(fileV, features=[500, 2000, 4000]):
 def newParse(fileV, features=[500, 2000, 4000]):
 
     fileV.seek(0)
-    print(fileV.name)
     
     file = VideoFileClip(fileV.name)
     clips = []
@@ -409,14 +408,23 @@ def newParse(fileV, features=[500, 2000, 4000]):
     for x in timestamps:
         clips.append(file.subclip(x, x+20))
 
-    final_clip = concatenate_videoclips(clips)
+    audioclips = [x.audio for x in clips]
 
-    suffix = ".mp4"
-    prefix = ("johnny{}").format(round(random()*1000000))
-    namedtemp = tempfile.NamedTemporaryFile(delete=False, prefix=prefix, suffix=suffix)
+    final_Vclip = concatenate_videoclips(clips)
+    final_Aclip = concatenate_audioclips(audioclips)
+
+    suffixA = ".mp3"
+    prefixA = ("johnny{}").format(round(random()*1000000))
+    audiofile = tempfile.NamedTemporaryFile(delete=False, prefix=prefixA, suffix=suffixA)
+
+    final_Aclip.write_audiofile(audiofile.name)
+
+    suffixV = ".mp4"
+    prefixV = ("johnny{}").format(round(random()*1000000))
+    namedtemp = tempfile.NamedTemporaryFile(delete=False, prefix=prefixV, suffix=suffixV)
     namedtemp.seek(0)
     
-    final_clip.write_videofile(namedtemp.name)
+    final_Vclip.write_videofile(namedtemp.name, audio=audiofile.name)
 
     return namedtemp
 
