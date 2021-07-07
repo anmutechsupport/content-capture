@@ -117,7 +117,30 @@ def svm_model(data, labels):
     print(confusion_matrix(y_test, y_pred))
     print(classification_report(y_test, y_pred))
 
+    # from sklearn.model_selection import cross_val_score
+    # scores = cross_val_score(svclassifier, data, labels, cv=10)
+    # print(scores)
+
     return svclassifier
+
+def random_search_svm(data, labels):
+
+    from sklearn.model_selection import train_test_split
+    X_train, X_test, y_train, y_test = train_test_split(data, labels, test_size = 0.1)
+
+    from sklearn.model_selection import GridSearchCV 
+    from sklearn.model_selection import train_test_split
+    from sklearn.svm import SVC 
+
+    parameters = {'C': [0.001, 0.01, 0.1, 1, 10, 100], 
+                'gamma': [0.001, 0.01, 0.1, 1, 10, 100]}
+
+    search = GridSearchCV(SVC(), parameters, cv=5)
+    
+    results  = search.fit(X_train, y_train)
+
+    return results
+
 
 def tree_model(data, labels):
 

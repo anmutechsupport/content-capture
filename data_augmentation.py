@@ -60,26 +60,6 @@ features = PSD(augmented_batches[:, 1:5], fs, filtering=True)
 
 normalized = descriptive_stats(features)
 
-classifier = tree_model(normalized, labels)
+search = random_search_svm(normalized, labels)
+print(search.best_params_)
 
-
-# data = data_sets.drop(["Interest"], axis=1).to_numpy()
-
-# # print(data.shape) #484352
-
-# features = PSD(data[:, 1:], fs, filtering=True)
-# # print(features.shape)
-
-# # features = features[:, :160, :].reshape(160, 4, 6)
-
-# normalized = descriptive_stats(features)
-# # print(rolling.shape)
-# # print(np.count_nonzero(np.array(labels_fil) == 1))
-
-# # print(normalized.shape)
-
-# svmclassifier = svm_model(normalized, labels_fil)
-# # logregclassifier = logreg_model(normalized, labels_fil)
-# # dectreeclassifier = tree_model(normalized, labels_fil)
-# # randomforestclassifier = random_forest(normalized, labels_fil)
-# # adaboostclassifier = ada_boost(normalized, labels_fil)
