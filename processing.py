@@ -226,7 +226,7 @@ def descriptive_stats(features):
     rolling = [[[[] for _ in range(math.floor(length/interval))] for _ in range(feats)] for _ in range(ch)] #(4, 6, 94)
     # print(np.array(rolling).shape)
 
-    for interv in range(int(length/interval)): #(+20)
+    for interv in tqdm(range(int(length/interval))): #(+20)
         for channel in range(ch):
             for f in range(feats):
                 window = pd.Series(features[channel, interv*interval:interv*interval+interval, f]).rolling(window_size).mean().dropna()
