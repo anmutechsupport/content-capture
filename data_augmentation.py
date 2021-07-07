@@ -3,6 +3,7 @@ import pandas as pd
 from random import randint
 from processing import *
 from scipy.stats import truncnorm
+from fastai.tabular.all import *
 
 def get_truncated_normal(mean=265, sd=265, low=0, upp=500):
     return truncnorm((low - mean) / sd, (upp - mean) / sd, loc=mean, scale=sd)
@@ -92,9 +93,19 @@ features = PSD(augmented_batches, fs, filtering=True)
 
 # print(features)
 
-normalized = descriptive_stats(features)
+normalized = pd.DataFrame(descriptive_stats(features))
+normalized["label"] = labels
 
-algo = svm_model(normalized, labels)
-search = random_search_svm(normalized, labels)
-print(search.best_params_)
+print(normalized.head())
 
+procs = [Categorify, FillMissing]
+dls = TabularDataLoaders.from_df(df = normalized, procs=procs, cont_names=list(normalized.columns)[:-1], 
+                                 y_names="label", y_block=CategoryBlock, bs=64)
+
+f1_score = F1Score()
+learn = tabular_learner(dls, metrics=[accuracy])
+
+learn.fit_one_cycle(15, cbs=EarlyStoppingCallback(min_delta=0.1, patience=2))
+# algo = svm_model(normalized, labels)
+# search = random_search_svm(normalized, labels)
+# print(search.best_params_)
