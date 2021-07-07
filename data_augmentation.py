@@ -1,6 +1,7 @@
 import numpy  as np 
 import pandas as pd
 from random import randint
+from processing import *
 
 fs = 256
 interval = 20
@@ -19,33 +20,47 @@ data_sets["Interest"] = labels_norm
 interested = np.array(data_sets[data_sets['Interest'] == 1])
 uninterested = np.array(data_sets[data_sets['Interest'] == 0])
 
-print(int(len(interested)/(fs*interval))*fs*interval)
+# print(int(len(interested)/(fs*interval))*fs*interval)
 # print(int(len(interested)/(fs*interval))) #53
 # print(int(len(uninterested)/(fs*interval))) #41
 
 # interestedN = np.array(np.array_split(interested[:int(len(interested)/(fs*interval))*fs*interval], int((len(interested)/(fs*interval))), axis=0))
 interestedN1 = np.array(np.array_split(np.array(np.array_split(interested[:int(len(interested)/(fs*interval))*fs*interval], int((len(interested)/(fs*interval))), axis=0)), k, axis=1)).reshape(10*-1, 512, 6)
 
-print(interestedN1.shape)
+# print(interestedN1.shape)
 
 new_pos_segments = []
 for n in range(500):
     ind = [interestedN1[randint(0, len(interestedN1)-1)] for x in range(10)]
     new_pos_segments.append(np.concatenate(ind, axis=0))
 
-print(np.array(new_pos_segments).shape)
+new_pos_segments = np.array(new_pos_segments)
 
 uninterestedN1 = np.array(np.array_split(np.array(np.array_split(uninterested[:int(len(uninterested)/(fs*interval))*fs*interval], int((len(uninterested)/(fs*interval))), axis=0)), k, axis=1)).reshape(10*-1, 512, 6)
 
-print(uninterestedN1.shape)
+# print(uninterestedN1.shape)
 
 new_neg_segments = []
 for n in range(500):
     ind = [uninterestedN1[randint(0, len(uninterestedN1)-1)] for x in range(10)]
     new_neg_segments.append(np.concatenate(ind, axis=0))
 
-print(np.array(new_neg_segments).shape)
+new_neg_segments = np.array(new_neg_segments)
 
+augmented_batches = np.concatenate((new_neg_segments, new_pos_segments), axis=0).reshape(-1*5120, 6, order='F')
+
+# print(augmented_batches[:, 1:5].shape)
+
+labels = np.concatenate((np.zeros(500), np.full(500, 1)))
+# print(labels.shape)
+
+features = PSD(augmented_batches[:, 1:5], fs, filtering=True)
+
+# print(features)
+
+normalized = descriptive_stats(features)
+
+classifier = tree_model(normalized, labels)
 
 
 # data = data_sets.drop(["Interest"], axis=1).to_numpy()

@@ -5,9 +5,11 @@ from scipy import signal
 from brainflow.data_filter import DataFilter, FilterTypes, NoiseTypes
 from tqdm import tqdm 
 from sklearn.preprocessing import StandardScaler
+from scipy.special import logsumexp
 
 def PSD(df, fs, filtering=False):
 
+    print(df.shape)
     index, ch = df.shape[0], df.shape[1]
     feature_vectors = [[] for _ in range(ch)]
 
@@ -51,6 +53,54 @@ def PSD(df, fs, filtering=False):
     powers = np.log10(np.asarray(feature_vectors))
     return powers
 
+def log_PSD(df, fs, filtering=False):
+
+    print(df.shape)
+    index, ch = df.shape[0], df.shape[1]
+    feature_vectors = [[] for _ in range(ch)]
+
+    for x in tqdm(range(ch)):
+
+        if filtering == True:
+
+            DataFilter.perform_bandpass(df[:, x], fs, 15.0, 6.0, 4,
+                                FilterTypes.BESSEL.value, 0)
+            DataFilter.remove_environmental_noise(df[:, x], fs, NoiseTypes.SIXTY.value)
+
+        for y in range(0,index,fs):
+            
+            if len(df[y:y+fs, x]) != 256:
+                break
+
+            f, Pxx_den = signal.welch(df[y:y+fs, x], fs=fs, nfft=256) #simulated 4 point overlap
+            # plt.semilogy(f, Pxx_den)
+            # plt.ylim([0.5e-3, 1])
+            # plt.xlabel('frequency [Hz]')
+            # plt.ylabel('PSD [V**2/Hz]')
+            # plt.show()
+
+            ind_delta, = np.where(f < 4)
+            meanDelta = np.mean(Pxx_den[ind_delta], axis=0)
+            # Theta 4-8
+            ind_theta, = np.where((f >= 4) & (f <= 8))
+            meanTheta = np.mean(Pxx_den[ind_theta], axis=0)
+            # Alpha 8-12
+            ind_alpha, = np.where((f >= 8) & (f <= 12))
+            meanAlpha = np.mean(Pxx_den[ind_alpha], axis=0)
+            # Beta 12-30
+            ind_beta, = np.where((f >= 12) & (f < 30))
+            meanBeta = np.mean(Pxx_den[ind_beta], axis=0)
+            # Gamma 30-100+
+            ind_Gamma, = np.where((f >= 30) & (f < 40))
+            meanGamma = np.mean(Pxx_den[ind_Gamma], axis=0)
+            # print(y)
+            # feature_vectors[x].insert(y, [np.exp(logsumexp(meanTheta) - logsumexp(meanAlpha)), np.exp(logsumexp(meanTheta) - logsumexp(meanBeta)), np.exp(logsumexp(meanTheta) - logsumexp(meanGamma)), np.exp(logsumexp(meanAlpha) - logsumexp(meanBeta)), np.exp(logsumexp(meanAlpha) - logsumexp(meanGamma)), np.exp(logsumexp(meanBeta) - logsumexp(meanGamma))])
+            feature_vectors[x].insert(y, [np.exp(logsumexp(meanTheta) - logsumexp(meanAlpha)), np.exp(logsumexp(meanTheta) - logsumexp(meanBeta)), np.exp(logsumexp(meanTheta) - logsumexp(meanGamma)), np.exp(logsumexp(meanAlpha) - logsumexp(meanBeta)), np.exp(logsumexp(meanAlpha) - logsumexp(meanGamma)), np.exp(logsumexp(meanBeta) - logsumexp(meanGamma))])
+
+    # powers = np.log10(np.asarray(feature_vectors))
+    powers = np.asarray(feature_vectors)
+    return powers
+
 def svm_model(data, labels):
 
     from sklearn.model_selection import train_test_split
@@ -62,10 +112,10 @@ def svm_model(data, labels):
     
     y_pred = svclassifier.predict(X_test)
 
-    # from sklearn.metrics import classification_report, confusion_matrix
-    # print("SVM")
-    # print(confusion_matrix(y_test, y_pred))
-    # print(classification_report(y_test, y_pred))
+    from sklearn.metrics import classification_report, confusion_matrix
+    print("SVM")
+    print(confusion_matrix(y_test, y_pred))
+    print(classification_report(y_test, y_pred))
 
     return svclassifier
 
@@ -81,10 +131,10 @@ def tree_model(data, labels):
     
     y_pred = treeclassifier.predict(X_test)
 
-    # from sklearn.metrics import classification_report, confusion_matrix
-    # print("Decision Tree")
-    # print(confusion_matrix(y_test, y_pred))
-    # print(classification_report(y_test, y_pred))
+    from sklearn.metrics import classification_report, confusion_matrix
+    print("Decision Tree")
+    print(confusion_matrix(y_test, y_pred))
+    print(classification_report(y_test, y_pred))
 
     return treeclassifier
 
@@ -100,10 +150,10 @@ def logreg_model(data, labels):
     
     y_pred = logregclassifier.predict(X_test)
 
-    # from sklearn.metrics import classification_report, confusion_matrix
-    # print("Logistic Regression")
-    # print(confusion_matrix(y_test, y_pred))
-    # print(classification_report(y_test, y_pred))
+    from sklearn.metrics import classification_report, confusion_matrix
+    print("Logistic Regression")
+    print(confusion_matrix(y_test, y_pred))
+    print(classification_report(y_test, y_pred))
 
     return logregclassifier
 
@@ -118,10 +168,10 @@ def random_forest(data, labels):
     
     y_pred = randomforest.predict(X_test)
 
-    # from sklearn.metrics import classification_report, confusion_matrix
-    # print("Random Forests")
-    # print(confusion_matrix(y_test, y_pred))
-    # print(classification_report(y_test, y_pred))
+    from sklearn.metrics import classification_report, confusion_matrix
+    print("Random Forests")
+    print(confusion_matrix(y_test, y_pred))
+    print(classification_report(y_test, y_pred))
 
     return randomforest
 
@@ -137,10 +187,10 @@ def ada_boost(data, labels):
     
     y_pred = adaboost.predict(X_test)
 
-    # from sklearn.metrics import classification_report, confusion_matrix
-    # print("Ada_Boost")
-    # print(confusion_matrix(y_test, y_pred))
-    # print(classification_report(y_test, y_pred))
+    from sklearn.metrics import classification_report, confusion_matrix
+    print("Ada_Boost")
+    print(confusion_matrix(y_test, y_pred))
+    print(classification_report(y_test, y_pred))
 
     return adaboost
 
@@ -185,7 +235,7 @@ def create_modelFinal():
 
     data = data_sets.drop(["Interest"], axis=1).to_numpy()
 
-    # print(data.shape) #484352
+    # print(data[:, 1:].shape) #(484352, 4)
 
     features = PSD(data[:, 1:], fs, filtering=True)
     # print(features.shape)
