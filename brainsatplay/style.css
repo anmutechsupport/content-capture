@@ -6,6 +6,15 @@ body {
     height: 100vh;
 }
 
+img {
+
+    width: 300px;
+    height: auto;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
 h1 {
     font-size: 200%; 
     margin-top: 0; 

@@ -47,7 +47,8 @@ class UI{
         let HTMLtemplate = () => {return `
         <link rel="stylesheet" href="style.css">
             <div id='${this.props.id}' style='height:100%; width:100%; display: flex; align-items: center; justify-content: center;'>
-                <div class="pages" id='${this.props.id}div1' style='z-index: 5;'>
+                <div class="pages" id='${this.props.id}div1' style='z-index: 5; position: relative; top: -125px'>
+                    <img src="mindframelogo.svg" style="position: relative; top: 115px;">
                     <h1 style="text-align: center; position: relative; top: 15px;"> MindFrames </h1>
                     <div>
                         <p>
