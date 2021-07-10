@@ -93,20 +93,6 @@ features = PSD(augmented_batches, fs, filtering=True)
 
 # print(features)
 
-normalized = pd.DataFrame(descriptive_stats(features))
-normalized["label"] = labels
+normalized = descriptive_stats(features)
 
-print(normalized.head())
-
-procs = [Categorify, FillMissing, Normalize]
-dls = TabularDataLoaders.from_df(df = normalized, procs=procs, cont_names=list(normalized.columns)[:-1], 
-                                 y_names="label", y_block=CategoryBlock, bs=64)
-
-f1_score = F1Score()
-learn = tabular_learner(dls, metrics=[accuracy])
-
-learn.fit_one_cycle(30) # cbs=EarlyStoppingCallback(min_delta=0.1, patience=2)
-# learn.recorder.plot_losses()
-# algo = svm_model(normalized, labels)
-# search = random_search_svm(normalized, labels)
-# print(search.best_params_)
+algo = gaussian_nb(normalized, labels)

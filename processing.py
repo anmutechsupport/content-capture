@@ -17,7 +17,7 @@ def PSD(df, fs, filtering=False):
 
         if filtering == True:
 
-            DataFilter.perform_bandpass(df[:, x], fs, 15.0, 6.0, 4,
+            DataFilter.perform_bandpass(df[:, x], fs, 12.6491106, 36.0, 4,
                                 FilterTypes.BESSEL.value, 0)
             DataFilter.remove_environmental_noise(df[:, x], fs, NoiseTypes.SIXTY.value)
 
@@ -161,6 +161,24 @@ def tree_model(data, labels):
 
     return treeclassifier
 
+def gaussian_nb(data, labels):
+
+    from sklearn.model_selection import train_test_split
+    X_train, X_test, y_train, y_test = train_test_split(data, labels, test_size = 0.1)
+    
+    from sklearn.naive_bayes import GaussianNB
+
+    clf = GaussianNB()
+    clf.fit(X_train, y_train)
+    
+    y_pred = clf.predict(X_test)
+
+    from sklearn.metrics import classification_report, confusion_matrix
+    print("Naive Bayes")
+    print(confusion_matrix(y_test, y_pred))
+    print(classification_report(y_test, y_pred))
+
+    return clf
 
 def logreg_model(data, labels):
 
@@ -271,13 +289,13 @@ def create_modelFinal():
 
     # print(normalized.shape)
 
-    svmclassifier = svm_model(normalized, labels_fil)
+    naivebayes = gaussian_nb(normalized, labels_fil)
     # logregclassifier = logreg_model(normalized, labels_fil)
     # dectreeclassifier = tree_model(normalized, labels_fil)
     # randomforestclassifier = random_forest(normalized, labels_fil)
     # adaboostclassifier = ada_boost(normalized, labels_fil)
 
-    return svmclassifier
+    return naivebayes 
 
 # create_modelFinal()
 
