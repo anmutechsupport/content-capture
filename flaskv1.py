@@ -17,18 +17,13 @@ CORS(app)
 def form_example():
     if request.method == 'POST':
 
-        # fileremover = FileRemover()
-
-        # request_file = request.files.get('video')
         request_stamps = json.loads(request.form.get('timestamps'))
         request_data = json.loads(request.form.get('data'))
 
-        # print("elapsed time: {}".format(int(int(request_stamps["stop"])-int(request_stamps["startStream"]))/1000))
-        # print(request_file)
+        print("elapsed time: {}".format(int(int(request_stamps["stop"])-int(request_stamps["startVideo"]))/1000))
+
         # print(request_stamps)
         # print(len(request_data))
-
-        # request_file.save('test.mp4')
 
         # Note: when the request objects are saved, page refreshes
         # Note: file.read() returns bin, file.stream returns a spooledtempfile
@@ -42,27 +37,9 @@ def form_example():
         # features = predict(request_data, request_stamps)
         features = predict()
 
-        # with tempfile.NamedTemporaryFile(suffix=".mp4") as temp:
-        #     # print(temp.name)
-        #     temp.write(request_file.read())
-        #     temp.seek(0)
-        #     # newfile = parse_video(temp, features)
-        #     newfile = parse_video(temp)
-        #     newfile.seek(0)
-            
-        #     rel_path = os.path.relpath(newfile.name, tempfile.gettempdir())
-        #     print(rel_path)
-        #     try:
-        #         # return send_file(newfile.name, as_attachment=True)
-        #         resp = send_from_directory(tempfile.gettempdir(), rel_path, as_attachment=True)
-        #         fileremover.cleanup_once_done(resp, newfile.name)
-
-        #         return resp #as_attachment = True
-        #     except FileNotFoundError:
-        #         abort(404)
         return json.dumps(features.tolist())
 
-    return 'Form Data Example'
+    return 'Classifying interest'
 
 @app.route('/compile', methods=['POST', 'GET'])
 def json_example():
@@ -75,6 +52,7 @@ def json_example():
         request_labels = json.loads(request.form.get('labels'))
 
         print(request_labels)
+        #code a conditional that checks whether the user was ever interested during the video, if not return a json object instead
 
         with tempfile.NamedTemporaryFile(suffix=".mp4", delete=False) as temp:
             # print(temp.name)
@@ -96,7 +74,7 @@ def json_example():
             except FileNotFoundError:
                 abort(404)
 
-    return 'JSON Object Example'
+    return 'Slicing Video'
 
 if __name__ == '__main__':
     # run app in debug mode on port 5000
