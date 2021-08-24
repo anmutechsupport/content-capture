@@ -1,6 +1,6 @@
-### **MindFrames: Summarize Videos Using Your Brain**
+# **MindFrames: Summarize Videos Using Your Brain**
 
-# **TLDR. OF SOLUTION.**
+### **TLDR. OF SOLUTION.**
 
 ***Keep the Memorable Parts, Leave the rest***
 
