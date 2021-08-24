@@ -1,5 +1,3 @@
-# content-capture
-
 ### **MindFrames: Summarize Videos Using Your Brain**
 
 # **TLDR. OF SOLUTION.**
