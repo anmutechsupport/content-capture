@@ -1,5 +1,7 @@
 # **MindFrames: Summarize Videos Using Your Brain**
 
+https://user-images.githubusercontent.com/69090449/130699474-aae8bda4-9344-4020-a88f-18c0b4aa97f7.mp4
+
 ### **TLDR. OF SOLUTION.**
 
 ***Keep the Memorable Parts, Leave the rest***
@@ -10,6 +12,7 @@ But guess what? We have the technology today to pinpoint when you're interested 
 
 # THE PROJECT BREAKDOWN.
 
+Medium Article that breaksdown the solution:
 [Changing the way we Save Video with our Minds](https://anushmutyala.medium.com/mindframes-changing-the-way-we-save-video-8bc64761f19)
 
 # PROJECT RECREATION.
