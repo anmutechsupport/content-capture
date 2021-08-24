@@ -1,0 +1,9 @@
+flask_cors
+moviepy
+brainflow
+tqdm
+scipy 
+sklearn
+numpy 
+pandas
+

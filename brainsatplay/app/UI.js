@@ -31,7 +31,7 @@ class UI{
             currdiv: null
         }
 
-        this.connected = true
+        this.connected = false
         this.packagedData = null
         this.packagedVid = null
         this.interestPoints = null
